@@ -1,0 +1,15 @@
+Modelklassen en relaties:
+AgendaItem (belongsTo) -> user
+AttendanceCategory (hasMany) -> schedules
+AttendanceEmployee (hasMany) -> department
+AttendanceEmployee (hasMany) -> attendanceCategories
+AttendanceEmployee (belongsTo) -> department
+BorrowedEquipment (belongsTo) -> equipment
+EmployeeDepartment (hasMany) -> employees
+Equipment (hasMany) -> category
+Equipment (hasMany) -> isBorrowed
+Equipment (belongsTo) -> category
+EquipmentNote (belongsTo) -> equipment
+ScheduleChange (belongsTo) -> employee
+WeekSchedule (hasMany) -> employee
+WeekSchedule (belongsTo) -> employee

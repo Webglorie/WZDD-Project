@@ -1,0 +1,57 @@
+Modelklassen, Controllerklassen en Relaties:
+Model: AgendaItem
+Controllers: 
+Relatie (belongsTo): user
+
+Model: AttendanceCategory
+Controllers: 
+Relatie (hasMany): schedules
+
+Model: AttendanceEmployee
+Controllers: 
+Relatie (hasMany): department
+
+Model: AttendanceEmployee
+Controllers: 
+Relatie (hasMany): attendanceCategories
+
+Model: AttendanceEmployee
+Controllers: 
+Relatie (belongsTo): department
+
+Model: BorrowedEquipment
+Controllers: 
+Relatie (belongsTo): equipment
+
+Model: EmployeeDepartment
+Controllers: 
+Relatie (hasMany): employees
+
+Model: Equipment
+Controllers: 
+Relatie (hasMany): category
+
+Model: Equipment
+Controllers: 
+Relatie (hasMany): isBorrowed
+
+Model: Equipment
+Controllers: 
+Relatie (belongsTo): category
+
+Model: EquipmentNote
+Controllers: 
+Relatie (belongsTo): equipment
+
+Model: ScheduleChange
+Controllers: 
+Relatie (belongsTo): employee
+
+Model: WeekSchedule
+Controllers: 
+Relatie (hasMany): employee
+
+Model: WeekSchedule
+Controllers: 
+Relatie (belongsTo): employee
+
