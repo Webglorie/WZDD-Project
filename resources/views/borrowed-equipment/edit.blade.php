@@ -17,11 +17,6 @@
                 <h1 class="container-header h2">{{ $pageTitle }}</h1>
             </div>
         @endisset
-        @if(Session::has('success'))
-            <div class="alert alert-success">
-                {{ Session::get('success') }}
-            </div>
-        @endif
         <div class="primary-wrapper transparent-pw">
         <div class="">
             <div class="col-md-12">

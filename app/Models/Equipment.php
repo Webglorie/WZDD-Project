@@ -20,16 +20,19 @@ class Equipment extends Model
         'condition',
     ];
 
+    // Definieer de enum-klassen voor de status en conditie van het materiaal
     protected $enums = [
         'status' => EquipmentStatus::class,
         'condition' => EquipmentCondition::class,
     ];
 
+    // Definieer de relatie met het EquipmentCategory-model
     public function category()
     {
         return $this->belongsTo(EquipmentCategory::class);
     }
 
+    // Haal de laatste geleende datum van het materiaal op
     public function lastBorrowedDate()
     {
         $now = Carbon::now();
@@ -47,9 +50,10 @@ class Equipment extends Model
 
     public function borrowedEquipment()
     {
-        return $this->hasMany(BorrowedEquipment::class);
+        return $this->hasMany(BorrowedEquipment::class, 'equipment_id');
     }
 
+    // Controleer of het materiaal momenteel is uitgeleend
     public function isBorrowed()
     {
         $now = Carbon::now();
@@ -60,9 +64,9 @@ class Equipment extends Model
             ->exists();
     }
 
+    // Definieer de relatie met de EquipmentNote-modellen
     public function notes()
     {
         return $this->hasMany(EquipmentNote::class);
     }
-
 }

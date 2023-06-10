@@ -17,11 +17,7 @@
                 <h1 class="container-header h2">{{ $pageTitle }}</h1>
             </div>
         @endisset
-        @if(Session::has('success'))
-            <div class="alert alert-success">
-                {{ Session::get('success') }}
-            </div>
-        @endif
+
         <div class="primary-wrapper transparent-pw">
         <div class="">
             <div class="col-md-12">
@@ -30,7 +26,7 @@
 
                 <div class="card card-default">
                     <div class="card-header">
-                        <span class="card-title">{{ __('Update') }} Agenda Item</span>
+                        <span class="card-title">Agendapunt #{{ $agendaItem->id }} {{ __('Wijzigen') }}</span>
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('agenda-items.update', $agendaItem->id) }}"  role="form" enctype="multipart/form-data">

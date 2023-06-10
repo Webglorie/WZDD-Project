@@ -28,34 +28,18 @@
                 <div class="card">
                     <div class="card-header">
                         <div class="float-left">
-                            <span class="card-title">{{ __('Show') }} Borrowed Equipment</span>
+                            <span class="card-title">{{ __('Show') }} Employee Department</span>
                         </div>
                         <div class="float-right">
-                            <a class="btn btn-primary" href="{{ route('borrowed-equipments.index') }}"> {{ __('Back') }}</a>
+                            <a class="btn btn-primary" href="{{ route('employee-departments.index') }}"> {{ __('Back') }}</a>
                         </div>
                     </div>
 
                     <div class="card-body">
 
                         <div class="form-group">
-                            <strong>Equipment Id:</strong>
-                            {{ $borrowedEquipment->equipment_id }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Borrowed Date Begin:</strong>
-                            {{ $borrowedEquipment->borrowed_date_begin }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Borrowed Date End:</strong>
-                            {{ $borrowedEquipment->borrowed_date_end }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Borrower:</strong>
-                            {{ $borrowedEquipment->borrower }}
-                        </div>
-                        <div class="form-group">
-                            <strong>Ultimo Ticket Number:</strong>
-                            {{ $borrowedEquipment->ultimo_ticket_number }}
+                            <strong>Name:</strong>
+                            {{ $employeeDepartment->name }}
                         </div>
 
                     </div>

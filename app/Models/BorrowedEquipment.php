@@ -17,6 +17,7 @@ class BorrowedEquipment extends Model
         'ultimo_ticket_number',
     ];
 
+    // Validatie regels voor het vullen van de velden
     public static $rules = [
         'equipment_id' => 'required',
         'borrowed_date_begin' => 'required|date_format:Y-m-d H:i',
@@ -27,6 +28,6 @@ class BorrowedEquipment extends Model
 
     public function equipment()
     {
-        return $this->belongsTo(Equipment::class);
+        return $this->belongsTo(Equipment::class, 'equipment_id');
     }
 }

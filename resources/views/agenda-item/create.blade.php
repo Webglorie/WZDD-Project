@@ -1,27 +1,18 @@
 <x-app-layout>
-    <main class="col-md-9 ms-sm-auto col-lg-9 px-md-4">
-        @isset($breadcrumbs)
-            <div class="breadcrumb-wrapper primary-wrapper first-pw">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        @foreach ($breadcrumbs as $breadcrumb)
-                            <li class="breadcrumb-item {{ $breadcrumb['classes'] }}"><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['label'] }}</a></li>
-                        @endforeach
-                    </ol>
-                </nav>
-            </div>
-        @endisset
 
-        @isset($pageTitle)
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center primary-wrapper less-padding">
-                <h1 class="container-header h2">{{ $pageTitle }}</h1>
-            </div>
-        @endisset
-        @if(Session::has('success'))
-            <div class="alert alert-success">
-                {{ Session::get('success') }}
-            </div>
-        @endif
+    <main class="col-md-9 ms-sm-auto col-lg-9 px-md-4">
+        <div class="breadcrumb-wrapper primary-wrapper first-pw">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {{ Breadcrumbs::render('agenda-items.create') }}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center primary-wrapper less-padding">
+            <h1 class="container-header h2">{{ ($breadcrumb = Breadcrumbs::current()) ? $breadcrumb->title : 'Agendapunten' }}</h1>
+        </div>
+
         <div class="primary-wrapper transparent-pw">
         <div class="row">
             <div class="col-md-12">
@@ -30,7 +21,7 @@
 
                 <div class="card card-default">
                     <div class="card-header">
-                        <span class="card-title">{{ __('Create') }} Agenda Item</span>
+                        <span class="card-title">Maak een nieuwe Agendapunt</span>
                     </div>
                     <div class="card-body">
                         <form method="POST" action="{{ route('agenda-items.store') }}"  role="form" enctype="multipart/form-data">

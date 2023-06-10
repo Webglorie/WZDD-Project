@@ -5,7 +5,7 @@
             <!-- Session Status -->
             <x-auth-session-status class="mb-4" :status="session('status')" />
             <h1 class="h3 mb-3 fw-bold">Login Beheerdashboard</h1>
-            <p class="mb-3">Vul uw gebruikersnaam en wachtwoord in.</p>
+            <p class="mb-3">Vul uw e-mailadres en wachtwoord in.</p>
 
             <form method="POST" action="{{ route('login') }}">
             @csrf
@@ -13,7 +13,7 @@
             <!-- Email Address -->
                 <div>
 
-                    <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
+                    <x-text-input placeholder="E-mailadres" id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
 
@@ -21,7 +21,7 @@
                 <div class="mt-4">
 
 
-                    <x-text-input id="password" class="block mt-1 w-full"
+                    <x-text-input placeholder="Wachtwoord" id="password" class="block mt-1 w-full"
                                   type="password"
                                   name="password"
                                   required autocomplete="current-password" />

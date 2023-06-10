@@ -718,3 +718,6 @@ form.edit-menu-form {
 .wallboard-page .beschikbare-laptops .col-md-6{
     padding: 0px;
 }
+.collapse.show {
+    visibility: visible!important;
+}

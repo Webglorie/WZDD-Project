@@ -28,6 +28,7 @@ function showNotification() {
 
 $(document).ready(function() {
     splitListItems();
+    console.log("testttttt");
 
     function splitListItems() {
         setTimeout(function() {
@@ -145,40 +146,7 @@ $(document).ready(function() {
     fetchBorrowedEquipments();
 
 
-    $.getJSON('http://127.0.0.1:8000/api/attendance-employees-today', function(data) {
-        $.each(data, function(index, employee) {
-            var departmentId = employee.department_id;
-            var categoryId = employee.category_id;
-            var categoryName = employee.category_name;
-            var employeeName = employee.name;
 
-            // Controleer of category_id gelijk is aan 5 en sla de iteratie over als dat het geval is
-            if (categoryId != '5') {
-
-
-
-                // Zoek de juiste card op basis van department_id
-                var cardId = (departmentId === 1) ? '#servicedesk-col' : '#beheer-col';
-                var card = $(cardId);
-
-                // Zoek de juiste list-group-item op basis van category_name
-                var listItem = card.find('.list-group-item:has(.attendance-title:contains("' + categoryName + '"))');
-
-                // Als er geen bestaande list-group-item is met de attendance-title, maak er dan een nieuwe aan
-                if (listItem.length === 0) {
-                    listItem = $('<div class="list-group-item list-group-item-action"></div>');
-                    var attendanceTitle = $('<div class="attendance-title">' + categoryName + '</div>');
-                    var ul = $('<ul></ul>');
-                    listItem.append(attendanceTitle, ul);
-                    card.find('.list-group').append(listItem);
-                }
-
-                // Voeg de naam van de werknemer toe aan de lijst
-                var ul = listItem.find('ul');
-                ul.append('<li>' + employeeName + '</li>');
-            }
-        });
-    });
 
     function getEquipment() {
         $.ajax({
@@ -220,14 +188,36 @@ $(document).ready(function() {
                     var emptyMessage = '<div class="list-group-item">Er zijn geen agendapunten gevonden.</div>';
                     listGroup.append(emptyMessage);
                 } else {
-                    // Loop door de ontvangen AgendaItems en bouw de HTML
+                    var sortedItems = []; // Tijdelijke array voor gesorteerde items
+
+                    // Loop door de ontvangen AgendaItems en voeg ze toe aan de tijdelijke array
                     $.each(response, function(index, item) {
+                        sortedItems.push(item);
+                    });
+
+                    // Sorteer de tijdelijke array op basis van de tijd (van dichtbij naar ver weg)
+                    sortedItems.sort(function(a, b) {
+                        var timeA = new Date(a.time).getTime();
+                        var timeB = new Date(b.time).getTime();
+                        return timeA - timeB;
+                    });
+
+                    var itemCount = 0; // Teller voor bijgehouden items
+
+                    // Loop door de gesorteerde AgendaItems en bouw de HTML
+                    $.each(sortedItems, function(index, item) {
+                        if (itemCount >= 3) {
+                            return false; // Stop de lus zodra er 3 items zijn toegevoegd
+                        }
+
                         var html = '<div class="list-group-item list-group-item-action status-' + item.status + '">' +
                             '<b>' + item.time + ' - ' + item.status + ' - ' + item.remainingTime + '</b> - ' + item.location + ' - ' + item.description +
                             '</div>';
 
                         // Voeg de HTML toe aan de list-group
                         listGroup.append(html);
+
+                        itemCount++; // Verhoog de teller
                     });
                 }
             },
@@ -238,6 +228,7 @@ $(document).ready(function() {
     }
 
 
+
 // Initial call om de equipment op te halen
     getAgendaItems();
 
@@ -245,3 +236,51 @@ $(document).ready(function() {
     setInterval(getAgendaItems, 120000);
 
 });
+
+$(document).ready(function() {
+    $.getJSON('http://127.0.0.1:8000/api/attendance-schedules', function(data) {
+        $.each(data, function(index, employee) {
+            var departmentId = employee.department_id;
+            var categoryId = employee.category_id;
+            var categoryName = employee.category_name;
+            var employeeName = employee.employee_name;
+
+            // Controleer of category_id gelijk is aan 5 en sla de iteratie over als dat het geval is
+            if (categoryId != '1') {
+                // Zoek de juiste card op basis van department_id
+                var cardId = (departmentId === 1) ? '#servicedesk-col' : '#beheer-col';
+                var card = $(cardId);
+
+                // Zoek de juiste list-group-item op basis van category_name
+                var listItem = card.find('.list-group-item:has(.attendance-title:contains("' + categoryName + '"))');
+
+                // Als er geen bestaande list-group-item is met de attendance-title, maak er dan een nieuwe aan
+                if (listItem.length === 0) {
+                    listItem = $('<div class="list-group-item list-group-item-action"></div>');
+                    var attendanceTitle = $('<div class="attendance-title">' + categoryName + '</div>');
+                    var ul = $('<ul></ul>');
+                    listItem.append(attendanceTitle, ul);
+                    card.find('.list-group').append(listItem);
+                }
+
+                // Voeg de naam van de werknemer toe aan de lijst
+                var ul = listItem.find('ul');
+                ul.append('<li>' + employeeName + '</li>');
+            }
+        });
+    });
+});
+
+function getCategoryName(categoryId) {
+    // Hier kun je de categorieën en hun bijbehorende ID's definiëren
+    // Vervang deze logica door je eigen categorieën en ID's
+    switch (categoryId) {
+        case '1':
+            return 'Aanwezig';
+        case '2':
+            return 'Thuiswerken';
+        // Voeg hier andere categorieën toe
+        default:
+            return '';
+    }
+}

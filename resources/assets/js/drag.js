@@ -9,6 +9,43 @@ draggables.forEach((task) => {
         task.classList.remove("is-dragging");
     });
 });
+// Definieer een lege array
+var draggedCards = [];
+
+// Voeg de draggable elementen toe aan de array
+$('.task').each(function() {
+    draggedCards.push(this);
+});
+
+draggedCards.forEach((task) => {
+    task.addEventListener("dragend", () => {
+        const newCategoryId = $(task).closest('.attendance-category-block').attr('data-attendancecatid');
+        const oldCategoryId = $(task).attr('data-catid');
+        const attendanceId = $(task).attr('data-attendanceid');
+
+        // Bepaal het dayOfWeek nummer (1-5 voor maandag-vrijdag, 1 voor zaterdag/zondag)
+        const currentDay = new Date().getDay();
+        let dayOfWeek;
+
+        if (currentDay === 0 || currentDay === 6) {
+            dayOfWeek = 1;
+        } else {
+            dayOfWeek = currentDay;
+        }
+
+        // API-aanroep om de categorie-ID bij te werken op basis van de dag van de week
+        $.ajax({
+            url: '/api/attendance/update-category/' + dayOfWeek + '/' + attendanceId + '/' + newCategoryId,
+            type: 'PUT',
+            success: function(response) {
+                console.log(response.message);
+            },
+            error: function(xhr, status, error) {
+                console.log(xhr.responseJSON.message);
+            }
+        });
+    });
+});
 
 droppables.forEach((zone) => {
     zone.addEventListener("dragover", (e) => {
@@ -30,7 +67,7 @@ droppables.forEach((zone) => {
         if (targetLane) {
             const targetLaneId = targetLane.getAttribute("id");
             const draggedTask = document.querySelector(".is-dragging");
-            const attendanceCatBlock = draggedTask.closest(".attendance-category-block");
+            const attendanceCatBlock = draggedTask.closest(".attendance-categories-block");
 
             if (attendanceCatBlock) {
                 const attendanceCatId = attendanceCatBlock.getAttribute("id").replace("attendance-cat-", "");

@@ -39,7 +39,7 @@
             <div class="primary-wrapper border p-3 col-md-6">
                 <p class="lead">Welkom terug, {{ Auth::user()->name }}</p>
                 <p>Met behulp van dit handige beheerdashboard heb je volledige controle over de informatie die wordt weergegeven op het wallboard van de ZIT Servicedesk. Als je niet zeker bent over hoe je een specifieke actie moet uitvoeren, is het ten zeerste aanbevolen om de gedetailleerde documentatie zorgvuldig door te nemen, zodat je eventuele fouten kunt vermijden.</p>
-                <a class="btn btn-lg btn-primary" href="/docs/5.0/components/navbar/" role="button">View navbar docs »</a>
+
             </div>
             <div class="primary-wrapper border p-3 col-md-6">
                 <p class="lead">Links naar de documentatie</p>

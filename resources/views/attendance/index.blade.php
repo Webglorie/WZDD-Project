@@ -1,17 +1,16 @@
 <x-app-layout>
+
     <main class="col-md-9 ms-sm-auto col-lg-9 px-md-4">
         <div class="breadcrumb-wrapper primary-wrapper first-pw">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
-                    @foreach ($breadcrumbs as $breadcrumb)
-                        <li class="breadcrumb-item {{ $breadcrumb['classes'] }}"><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['label'] }}</a></li>
-                    @endforeach
+                    {{ Breadcrumbs::render('attendance.index') }}
                 </ol>
             </nav>
         </div>
 
         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center primary-wrapper less-padding">
-            <h1 class="container-header h2">{{ $pageTitle }}</h1>
+            <h1 class="container-header h2">{{ ($breadcrumb = Breadcrumbs::current()) ? $breadcrumb->title : 'Agendapunten' }}</h1>
         </div>
 
         @if(Session::has('success'))
@@ -529,7 +528,7 @@
         // $('#addModal').on('shown.bs.modal', function () {
         //     // Laad de AttendanceCategory-opties in de dropdown
         //     $.ajax({
-        //         url: '/api/attendance-categories',
+        //         url: '/api/categories',
         //         type: 'GET',
         //         success: function (data) {
         //             const categoryDropdown = $('#category');

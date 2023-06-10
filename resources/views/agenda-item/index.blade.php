@@ -1,27 +1,17 @@
 <x-app-layout>
-    <main class="col-md-9 ms-sm-auto col-lg-9 px-md-4">
-        @isset($breadcrumbs)
-            <div class="breadcrumb-wrapper primary-wrapper first-pw">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        @foreach ($breadcrumbs as $breadcrumb)
-                            <li class="breadcrumb-item {{ $breadcrumb['classes'] }}"><a href="{{ $breadcrumb['url'] }}">{{ $breadcrumb['label'] }}</a></li>
-                        @endforeach
-                    </ol>
-                </nav>
-            </div>
-        @endisset
 
-        @isset($pageTitle)
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center primary-wrapper less-padding">
-                <h1 class="container-header h2">{{ $pageTitle }}</h1>
-            </div>
-        @endisset
-        @if(Session::has('success'))
-            <div class="alert alert-success">
-                {{ Session::get('success') }}
-            </div>
-        @endif
+    <main class="col-md-9 ms-sm-auto col-lg-9 px-md-4">
+        <div class="breadcrumb-wrapper primary-wrapper first-pw">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {{ Breadcrumbs::render('agenda-items.index') }}
+                </ol>
+            </nav>
+        </div>
+
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center primary-wrapper less-padding">
+            <h1 class="container-header h2">{{ ($breadcrumb = Breadcrumbs::current()) ? $breadcrumb->title : 'Agendapunten' }}</h1>
+        </div>
         <div class="primary-wrapper transparent-pw">
         <div class="row">
             <div class="col-sm-12">
@@ -30,12 +20,17 @@
                         <div style="display: flex; justify-content: space-between; align-items: center;">
 
                             <span id="card_title">
-                                {{ __('Agenda Item') }}
+                                @if(isset($status) && !empty($status))
+                                    Agendapunten met status {{ ucfirst(trans($status)) }}
+
+                                @else
+                                    {{ __('Geplande Agendapunten') }}
+                                @endif
                             </span>
 
                              <div class="float-right">
                                 <a href="{{ route('agenda-items.create') }}" class="btn btn-primary btn-sm float-right"  data-placement="left">
-                                  {{ __('Create New') }}
+                                  {{ __('Nieuwe maken') }}
                                 </a>
                               </div>
                         </div>
@@ -51,11 +46,11 @@
                             <table class="table table-striped table-hover">
                                 <thead class="thead">
                                 <tr>
-                                    <th>No</th>
-                                    <th>Time</th>
+                                    <th>#</th>
+                                    <th>Tijd</th>
                                     <th>Status</th>
-                                    <th>Location</th>
-                                    <th>Description</th>
+                                    <th>Locatie</th>
+                                    <th>Beschrijving</th>
                                     <th></th>
                                 </tr>
                                 </thead>
@@ -69,11 +64,11 @@
                                         <td>{{ $agendaItem->description }}</td>
                                         <td>
                                             <form action="{{ route('agenda-items.destroy',$agendaItem->id) }}" method="POST">
-                                                <a class="btn btn-sm btn-primary" data-toggle="modal" data-target="#showModal{{ $agendaItem->id }}"><i class="fa fa-fw fa-eye"></i> {{ __('Show') }}</a>
-                                                <a class="btn btn-sm btn-success" href="{{ route('agenda-items.edit',$agendaItem->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Edit') }}</a>
+                                                <a class="btn btn-sm btn-primary" data-toggle="modal" data-target="#showModal{{ $agendaItem->id }}"><i class="fa fa-fw fa-eye"></i> {{ __('Bekijken') }}</a>
+                                                <a class="btn btn-sm btn-success" href="{{ route('agenda-items.edit',$agendaItem->id) }}"><i class="fa fa-fw fa-edit"></i> {{ __('Wijzigen') }}</a>
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> {{ __('Delete') }}</button>
+                                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> {{ __('Verwijderen') }}</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -83,17 +78,17 @@
                                         <div class="modal-dialog" role="document">
                                             <div class="modal-content">
                                                 <div class="modal-header">
-                                                    <h5 class="modal-title" id="showModalLabel{{ $agendaItem->id }}">{{ __('Show') }} Agenda Item</h5>
+                                                    <h5 class="modal-title" id="showModalLabel{{ $agendaItem->id }}">Agendapunten {{ __('Bekijken') }}</h5>
                                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                                         <span aria-hidden="true">&times;</span>
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <p><strong>Time:</strong> {{ $agendaItem->time }}</p>
+                                                    <p><strong>Tijd:</strong> {{ $agendaItem->time }}</p>
                                                     <p><strong>Status:</strong> {{ $agendaItem->getStatus() }} - {{ $agendaItem->getRemainingTime() }}</p>
-                                                    <p><strong>Location:</strong> {{ $agendaItem->location }}</p>
-                                                    <p><strong>Description:</strong></p> <p>{!! $agendaItem->description !!}</p>
-                                                    <p><strong>Created by:</strong> {{ $agendaItem->createdBy->name }}</p>
+                                                    <p><strong>Locatie:</strong> {{ $agendaItem->location }}</p>
+                                                    <p><strong>Beschrijving:</strong></p> <p>{!! $agendaItem->description !!}</p>
+                                                    <p><strong>Gemaakt door:</strong> {{ $agendaItem->createdBy->name }}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -109,5 +104,88 @@
             </div>
         </div>
     </div>
-    </main>
+
+
+    @if(isset($expiredItems) && !empty($expiredItems))
+        <div class="primary-wrapper transparent-pw">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+
+                            <span id="card_title">
+                                {{ __('Verlopen Agendapunten') }}
+                            </span>
+
+
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="thead">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Tijd</th>
+                                        <th>Status</th>
+                                        <th>Locatie</th>
+                                        <th>Beschrijving</th>
+                                        <th></th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach ($expiredItems as $expiredItem)
+                                        <tr>
+                                            <td>{{ ++$i }}</td>
+                                            <td>{{ $expiredItem->time }}</td>
+                                            <td>{{ $expiredItem->getStatus() }} - {{ $expiredItem->getRemainingTime() }}</td>
+                                            <td>{{ $expiredItem->location }}</td>
+                                            <td>{{ $expiredItem->description }}</td>
+                                            <td>
+                                                <form action="{{ route('agenda-items.destroy',$expiredItem->id) }}" method="POST">
+                                                    <a class="btn btn-sm btn-primary" data-toggle="modal" data-target="#showModal{{ $expiredItem->id }}"><i class="fa fa-fw fa-eye"></i> {{ __('Bekijken') }}</a>
+
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-fw fa-trash"></i> {{ __('Verwijderen') }}</button>
+                                                </form>
+                                            </td>
+                                        </tr>
+
+                                        <!-- Show Modal -->
+                                        <div class="modal fade" id="showModal{{ $expiredItem->id }}" tabindex="-1" role="dialog" aria-labelledby="showModalLabel{{ $expiredItem->id }}" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="showModalLabel{{ $expiredItem->id }}">Agendapunten {{ __('Bekijken') }}</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p><strong>Tijd:</strong> {{ $expiredItem->time }}</p>
+                                                        <p><strong>Status:</strong> {{ $expiredItem->getStatus() }} - {{ $expiredItem->getRemainingTime() }}</p>
+                                                        <p><strong>Locatie:</strong> {{ $expiredItem->location }}</p>
+                                                        <p><strong>Beschrijving:</strong></p>
+                                                        <p>{!! $expiredItem->description !!}</p>
+                                                        <p><strong>Gemaakt door:</strong> {{ $expiredItem->createdBy->name }}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    @endif
+</main>
 </x-app-layout>

@@ -3,158 +3,167 @@
 namespace App\Http\Controllers;
 
 use App\Models\AgendaItem;
+use App\Repositories\Interfaces\AgendaItemRepositoryInterface;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
-/**
- * Class AgendaItemController
- * @package App\Http\Controllers
- */
 class AgendaItemController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    private $agendaItemRepository;
+
+    public function __construct(AgendaItemRepositoryInterface $agendaItemRepository)
+    {
+        $this->agendaItemRepository = $agendaItemRepository;
+    }
+
     public function index(Request $request, $status = null)
     {
-        // Haal alle AgendaItems op
-        $allAgendaItems = AgendaItem::all();
+        $pageTitle = 'Agendapunten Overzicht';
+        $activeMenuItem = 'agenda-items';
+        $breadcrumbs = [
+            ['url' => '/', 'label' => 'Home', 'classes' => ''],
+            ['url' => '/agenda-items', 'label' => 'Agendapunten Overzicht', 'classes' => 'active'],
+        ];
 
-        // Filter op basis van status indien opgegeven
-        if ($status) {
-            $agendaItems = $allAgendaItems->filter(function ($agendaItem) use ($status) {
-                return strtolower($agendaItem->getStatus()) === strtolower($status);
-            });
-        } else {
-            $agendaItems = $allAgendaItems;
-        }
+        $agendaItems = $this->agendaItemRepository->getAllAgendaItems($status);
 
-        // Paginering is niet van toepassing omdat we alle items of gefilterde items tonen
+        $expiredItems = $agendaItems->filter(function ($agendaItem) {
+            $agendaItem->time = Carbon::parse($agendaItem->time)->format('d-m-Y H:i:s');
+            return $agendaItem->getStatus() === 'Verlopen';
+        });
+
+        $agendaItems = $agendaItems->reject(function ($agendaItem) {
+            return $agendaItem->getStatus() === 'Verlopen';
+        });
+
+        return view('agenda-item.index', compact('agendaItems', 'expiredItems'))
+            ->with('status', $status)
+            ->with('activeMenuItem', $activeMenuItem)
+            ->with('breadcrumbs', $breadcrumbs)
+            ->with('i', 0);
+
+
+
+    }
+
+    public function status(Request $request, $status = null)
+    {
+        $pageTitle = 'Agendapunten Overzicht';
+        $activeMenuItem = 'agenda-items';
+        $breadcrumbs = [
+            ['url' => '/', 'label' => 'Home', 'classes' => ''],
+            ['url' => '/agenda-items', 'label' => 'Agendapunten Overzicht', 'classes' => 'active'],
+        ];
+
+        $agendaItems = $this->agendaItemRepository->getAllAgendaItems($status);
 
         return view('agenda-item.index', compact('agendaItems'))
+            ->with('status', $status)
+            ->with('activeMenuItem', $activeMenuItem)
+            ->with('breadcrumbs', $breadcrumbs)
             ->with('i', 0);
+
+
+
     }
 
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
+        $pageTitle = 'Nieuwe Agendapunt Toevoegen';
+        $activeMenuItem = 'agenda-items';
+        $breadcrumbs = [
+            ['url' => '/', 'label' => 'Home', 'classes' => ''],
+            ['url' => '/agenda-items', 'label' => 'Agendapunten Overzicht', 'classes' => ''],
+            ['url' => '/agenda-items/create', 'label' => 'Nieuwe Agendapunt Toevoegen', 'classes' => 'active'],
+        ];
+
         $agendaItem = new AgendaItem();
-        return view('agenda-item.create', compact('agendaItem'));
+        return view('agenda-item.create', compact('agendaItem'))
+            ->with('pageTitle', $pageTitle)
+            ->with('activeMenuItem', $activeMenuItem)
+            ->with('breadcrumbs', $breadcrumbs);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        $data = request()->validate(AgendaItem::$rules);
-
-//        // Convert the input datetime format to the database format
-//        $data['time'] = Carbon::createFromFormat('d-m-Y H:i', $data['time'])->format('Y-m-d H:i:s');
-
-        $agendaItem = AgendaItem::create($data);
+        $data = $request->validate(AgendaItem::$rules);
+        $agendaItem = $this->agendaItemRepository->createAgendaItem($data);
 
         return redirect()->route('agenda-items.index')
-            ->with('success', 'AgendaItem created successfully.');
+            ->with('success', 'Agendapunt is toegevoegd.');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        $agendaItem = AgendaItem::find($id);
+        $agendaItem = $this->agendaItemRepository->getAgendaItemById($id);
 
         return view('agenda-item.show', compact('agendaItem'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
     public function edit($id)
     {
-        $agendaItem = AgendaItem::find($id);
+        $pageTitle = 'Wijzig Agendapunt';
+        $activeMenuItem = 'agenda-items';
+        $breadcrumbs = [
+            ['url' => '/', 'label' => 'Home', 'classes' => ''],
+            ['url' => '/agenda-items', 'label' => 'Agendapunten Overzicht', 'classes' => ''],
+            ['url' => '/agenda-items/'.$id.'/edit', 'label' => 'Wijzig Agendapunt', 'classes' => 'active'],
+        ];
+        $agendaItem = $this->agendaItemRepository->getAgendaItemById($id);
 
-        return view('agenda-item.edit', compact('agendaItem'));
+        return view('agenda-item.edit', compact('agendaItem'))
+            ->with('pageTitle', $pageTitle)
+            ->with('activeMenuItem', $activeMenuItem)
+            ->with('breadcrumbs', $breadcrumbs);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  AgendaItem $agendaItem
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, AgendaItem $agendaItem)
+    public function update(Request $request, $id)
     {
-        request()->validate(AgendaItem::$rules);
-
-        $agendaItem->update($request->all());
+        $data = $request->validate(AgendaItem::$rules);
+        $this->agendaItemRepository->updateAgendaItem($id, $data);
 
         return redirect()->route('agenda-items.index')
-            ->with('success', 'AgendaItem updated successfully');
+            ->with('success', 'Agendapunt met id #'.$id.' succesvol gewijzigd');
     }
 
-    /**
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
-     * @throws \Exception
-     */
     public function destroy($id)
     {
-        $agendaItem = AgendaItem::find($id)->delete();
+        $this->agendaItemRepository->deleteAgendaItem($id);
 
         return redirect()->route('agenda-items.index')
-            ->with('success', 'AgendaItem deleted successfully');
+            ->with('success', 'Agendapunt met id #'.$id.' succesvol verwijderd');
     }
 
     public function getAgendaItems(Request $request)
     {
-        $agendaItems = AgendaItem::all()->filter(function ($agendaItem) {
-            return $agendaItem->getStatus() !== 'Verlopen';
-        });
+        $agendaItems = $this->agendaItemRepository->getActiveAgendaItems();
 
         $agendaItemsWithStatus = $agendaItems->map(function ($agendaItem) {
-                return [
-                    'time' => $agendaItem->time,
-                    'location' => $agendaItem->location,
-                    'description' => $agendaItem->description,
-                    'status' => $agendaItem->getStatus(),
-                    'remainingTime' => $agendaItem->getRemainingTime(),
-                ];
-
-
+            return [
+                'time' => $agendaItem->time,
+                'location' => $agendaItem->location,
+                'description' => $agendaItem->description,
+                'status' => $agendaItem->getStatus(),
+                'remainingTime' => $agendaItem->getRemainingTime(),
+            ];
         });
+
         return response()->json($agendaItemsWithStatus);
     }
 
     public function statusFilter($status)
     {
-        // Haal alle AgendaItems op
-        $agendaItems = AgendaItem::all();
+        $agendaItems = $this->agendaItemRepository->getAgendaItemsByStatus($status);
 
-        // Filter de AgendaItems op basis van de opgegeven status
-        $filteredItems = $agendaItems->filter(function ($agendaItem) use ($status) {
-            return $agendaItem->getStatus() === $status;
-        });
+        return view('agenda-items.index', compact('agendaItems'));
+    }
 
-        return view('agenda-items.index', compact('filteredItems'));
+    function sortByClosestToNow($a, $b) {
+        $now = Carbon::now();
+        $aTime = Carbon::parse($a->time);
+        $bTime = Carbon::parse($b->time);
+
+        return abs($aTime->diffInSeconds($now)) - abs($bTime->diffInSeconds($now));
     }
 
 }

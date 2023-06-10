@@ -6,21 +6,22 @@ use Carbon\Carbon;
 use Carbon\Traits\ToStringFormat;
 use Illuminate\Database\Eloquent\Model;
 
-class AgendaItem extends Model
+class   AgendaItem extends Model
 {
     protected $fillable = ['time', 'location', 'description'];
 
+    // Validatie regels voor het vullen van de velden
     public static $rules = [
         'time' => 'required',
         'location' => 'required|in:Eindhoven,Veldhoven',
         'description' => 'required|string',
     ];
 
-    // Define the valid location options as constants
+    // Definieer de geldige locatie opties als constanten
     public const LOCATION_EINDHOVEN = 'Eindhoven';
     public const LOCATION_VELDHOVEN = 'Veldhoven';
 
-    // Define the accessor method to return the location value as an enum-like string
+    // Definieer de functie om de locatie terug te geven als een enum achtige string
     public function getLocationAttribute($value)
     {
         switch ($value) {
@@ -33,7 +34,7 @@ class AgendaItem extends Model
         }
     }
 
-    // Define the mutator method to set the location value based on the provided enum-like string
+    // Definieer de functie om de locatie in te stellen op basis van de opgegeven enum achtige string
     public function setLocationAttribute($value)
     {
         switch ($value) {
@@ -49,26 +50,28 @@ class AgendaItem extends Model
         }
     }
 
-    // Define the relationship with the User model
+    // Definieer de relatie met het User model
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
+    // Haal de huidige tijd op
     public function getTimeNow()
     {
         $currentTime = Carbon::now('Europe/Amsterdam');
 
         return $currentTime;
-
     }
 
+    // Haal de status van het agendapunt op
+    // TODO: Hier is mogelijk nog wat te verbeteren wanneer er tijd voor is.
     public function getStatus()
     {
         $time = Carbon::parse($this->time)->setTimezone('Europe/Amsterdam');
         $currentTime = Carbon::now('Europe/Amsterdam');
 
-        if ($currentTime >= $time && $currentTime <= $time->copy()->addMinutes(15)){
+        if ($currentTime >= $time && $currentTime <= $time->copy()->addMinutes(15)) {
             $status = "Nu";
         } elseif ($currentTime > $time) {
             $status = "Verlopen";
@@ -90,15 +93,15 @@ class AgendaItem extends Model
         return $status;
     }
 
-
-
+    // Haal de resterende tijd van het agendapunt op
+    // TODO: Hier is mogelijk nog wat te verbeteren wanneer er tijd voor is.
     public function getRemainingTime()
     {
         $time = Carbon::parse($this->time)->setTimezone('Europe/Amsterdam');
         $currentTime = Carbon::now('Europe/Amsterdam');
         $timeDifference = $currentTime->diff($time);
 
-        if ($currentTime >= $time && $currentTime <= $time->copy()->addMinutes(15)){
+        if ($currentTime >= $time && $currentTime <= $time->copy()->addMinutes(15)) {
             $status = $timeDifference->i . " minuten geleden";
         } elseif ($currentTime > $time) {
             $status = "Agendapunt is verlopen";
@@ -121,10 +124,9 @@ class AgendaItem extends Model
         return $status;
     }
 
-
+    // Definieer de relatie met het User model voor de aanmaker van het agendapunt
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
 }
