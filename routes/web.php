@@ -53,7 +53,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/employees/{employee}/schedules/save', [AttendanceEmployeeController::class, 'saveSchedules'])->name('employees.saveSchedules');
 
-    Route::delete('/attendance-categories/{categoryId}', [AttendanceCategoryController::class, 'destroy'])->name('attendance-categories.destroy');
+    Route::delete('/attendance-categories/{categoryId}', [AttendanceCategoryController::class, 'destroy'])->name('attendance-categories.destroycategory');
 
     Route::put('/schedules/update', [AttendanceWeeklyScheduleController::class, 'updateAllCategories'])->name('schedules.updateAllCategories');
 
@@ -83,7 +83,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/borrowed-equipments/list/{category}', [BorrowedEquipmentController::class, 'showList'])->name('borrowed-equipments.list');
 
-    Route::get('/attendance-overview/', [AttendanceCategoryController::class, 'index'])->name('attendance-categories.index');
+    Route::get('/attendance-overview/', [AttendanceCategoryController::class, 'index'])->name('attendance-categories.overview');
 
 
     Route::put('/equipment/set-available/{equipment}', [EquipmentController::class, 'setAvailable'])->name('equipment.setAvailable');
